@@ -1,0 +1,99 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+
+using namespace std;
+
+void unosImena(vector<string>& imena, int& N) {
+    cout << "Unesite broj imena (N<20): ";
+    cin >> N;
+    if (N >= 20) {
+        cout << "Broj imena mora biti manji od 20!" << endl;
+        return;
+    }
+    imena.clear();
+    for (int i = 0; i < N; i++) {
+        string ime;
+        cout << "Unesite ime #" << i + 1 << ": ";
+        cin >> ime;
+        imena.push_back(ime);
+    }
+}
+
+void pregledImena(const vector<string>& imena) {
+    cout << "Trenutni podaci:" << endl;
+    for (const auto& ime : imena) {
+        cout << ime << endl;
+    }
+}
+
+void snimiImenaUDatoteku(const vector<string>& imena) {
+    string nazivDatoteke;
+    cout << "Unesite naziv datoteke: ";
+    cin >> nazivDatoteke;
+
+    ofstream datoteka(nazivDatoteke);
+    if (!datoteka) {
+        cout << "Greška pri otvaranju datoteke!" << endl;
+        return;
+    }
+
+    datoteka << imena.size() << endl;
+    for (const auto& ime : imena) {
+        datoteka << ime << endl;
+    }
+
+    cout << "Podaci su snimljeni!" << endl;
+}
+
+void ucitajImenaIzDatoteke(vector<string>& imena) {
+    string nazivDatoteke;
+    cout << "Unesite naziv datoteke: ";
+    cin >> nazivDatoteke;
+
+    ifstream datoteka(nazivDatoteke);
+    if (!datoteka) {
+        cout << "Greška pri otvaranju datoteke!" << endl;
+        return;
+    }
+
+    int N;
+    datoteka >> N;
+    imena.clear();
+
+    for (int i = 0; i < N; i++) {
+        string ime;
+        datoteka >> ime;
+        imena.push_back(ime);
+    }
+
+    cout << "Podaci su učitani!" << endl;
+}
+
+int main() {
+    vector<string> imena;
+    int N;
+    int izbor;
+
+    do {
+        cout << "\nIzbornik:\n";
+        cout << "1. Unos imena\n";
+        cout << "2. Pregled podataka\n";
+        cout << "3. Snimanje u datoteku\n";
+        cout << "4. Učitavanje iz datoteke\n";
+        cout << "5. Izlaz\n";
+        cout << "Izaberite opciju: ";
+        cin >> izbor;
+
+        switch (izbor) {
+            case 1: unosImena(imena, N); break;
+            case 2: pregledImena(imena); break;
+            case 3: snimiImenaUDatoteku(imena); break;
+            case 4: ucitajImenaIzDatoteke(imena); break;
+            case 5: cout << "Izlaz iz programa." << endl; break;
+            default: cout << "Nepoznata opcija!" << endl; break;
+        }
+    } while (izbor != 5);
+
+    return 0;
+}
