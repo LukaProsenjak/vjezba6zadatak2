@@ -1,0 +1,172 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <iomanip>
+#include <algorithm>
+#include <limits>
+#include <string>
+
+using namespace std;
+
+struct Student {
+    string ime;
+    string prezime;
+    int bodovi;
+};
+
+void unosStudenata(vector<Student>& studenti) {
+    Student temp;
+    char nastavak;
+
+    do {
+        cout << "\nUnos novog studenta:\n";
+        cout << "Ime: ";
+        getline(cin >> ws, temp.ime);
+        cout << "Prezime: ";
+        getline(cin, temp.prezime);
+        cout << "Bodovi: ";
+        while (!(cin >> temp.bodovi) || temp.bodovi < 0) {
+            cout << "Nevazeci unos. Molimo unesite pozitivan cijeli broj: ";
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
+
+        studenti.push_back(temp);
+
+        cout << "Želite li unijeti jos studenata? (d/n): ";
+        cin >> nastavak;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+    } while (nastavak == 'd' || nastavak == 'D');
+}
+
+void snimiUDatoteku(const vector<Student>& studenti, const string& nazivDatoteke) {
+    ofstream datoteka(nazivDatoteke);
+
+    if (!datoteka) {
+        cerr << "Greska pri otvaranju datoteke za pisanje!\n";
+        return;
+    }
+
+    for (const auto& student : studenti) {
+        datoteka << student.ime << " " << student.prezime << " " << student.bodovi << "\n";
+    }
+
+    datoteka.close();
+    cout << "Podaci uspjesno snimljeni u datoteku '" << nazivDatoteke << "'.\n";
+}
+
+void ucitajIzDatoteke(vector<Student>& studenti, const string& nazivDatoteke) {
+    ifstream datoteka(nazivDatoteke);
+    studenti.clear();
+
+    if (!datoteka) {
+        cerr << "Greska pri otvaranju datoteke za citanje!\n";
+        return;
+    }
+
+    Student temp;
+    while (datoteka >> temp.ime >> temp.prezime >> temp.bodovi) {
+        studenti.push_back(temp);
+    }
+
+    datoteka.close();
+    cout << "Podaci uspjesno ucitani iz datoteke '" << nazivDatoteke << "'.\n";
+}
+
+void ispisiStudente(const vector<Student>& studenti) {
+    if (studenti.empty()) {
+        cout << "Nema studenata za prikaz!\n";
+        return;
+    }
+
+    cout << "\nPopis studenata:\n";
+    cout << left << setw(20) << "Ime" << setw(20) << "Prezime" << right << setw(10) << "Bodovi" << endl;
+    cout << string(50, '-') << endl;
+
+    for (const auto& student : studenti) {
+        string ime = student.ime.length() > 20 ? student.ime.substr(0, 17) + "..." : student.ime;
+        string prezime = student.prezime.length() > 20 ? student.prezime.substr(0, 17) + "..." : student.prezime;
+
+        cout << left << setw(20) << ime
+             << setw(20) << prezime
+             << right << setw(10) << student.bodovi << endl;
+    }
+}
+
+void sortirajStudente(vector<Student>& studenti) {
+    if (studenti.empty()) {
+        cout << "Nema studenata za sortiranje!\n";
+        return;
+    }
+
+    int nacin;
+    cout << "\nNacin sortiranja:\n";
+    cout << "1. Uzlazno (od najmanjeg do najveceg broja bodova)\n";
+    cout << "2. Silazno (od najveceg do najmanjeg broja bodova)\n";
+    cout << "Odabir: ";
+    cin >> nacin;
+
+    if (nacin == 1) {
+        sort(studenti.begin(), studenti.end(), [](const Student& a, const Student& b) {
+            return a.bodovi < b.bodovi;
+        });
+        cout << "Sortirano uzlazno prema bodovima.\n";
+    } else if (nacin == 2) {
+        sort(studenti.begin(), studenti.end(), [](const Student& a, const Student& b) {
+            return a.bodovi > b.bodovi;
+        });
+        cout << "Sortirano silazno prema bodovima.\n";
+    } else {
+        cout << "Nevazeci odabir. Sortiranje otkazano.\n";
+    }
+}
+
+int main() {
+    vector<Student> studenti;
+    int izbor;
+    string nazivDatoteke;
+
+    do {
+        cout << "\nGlavni izbornik:\n";
+        cout << "1. Unos novih studenata\n";
+        cout << "2. Snimanje studenata u datoteku\n";
+        cout << "3. Ucitavanje studenata iz datoteke\n";
+        cout << "4. Ispis studenata\n";
+        cout << "5. Sortiranje studenata po bodovima\n";
+        cout << "6. Izlaz\n";
+        cout << "Odaberite opciju: ";
+        cin >> izbor;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+        switch (izbor) {
+            case 1:
+                unosStudenata(studenti);
+                break;
+            case 2:
+                cout << "Unesite naziv datoteke: ";
+                getline(cin, nazivDatoteke);
+                snimiUDatoteku(studenti, nazivDatoteke);
+                break;
+            case 3:
+                cout << "Unesite naziv datoteke: ";
+                getline(cin, nazivDatoteke);
+                ucitajIzDatoteke(studenti, nazivDatoteke);
+                break;
+            case 4:
+                ispisiStudente(studenti);
+                break;
+            case 5:
+                sortirajStudente(studenti);
+                break;
+            case 6:
+                cout << "Izlaz iz programa.\n";
+                break;
+            default:
+                cout << "Nevazeci izbor. Pokusajte ponovno.\n";
+        }
+
+    } while (izbor != 6);
+
+    return 0;
+}
