@@ -1,0 +1,147 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <limits>
+#include <algorithm>
+
+using namespace std;
+
+void unosBrojeva(vector<int>& brojevi, int& N) {
+    cout << "Unesite broj brojeva (N<20): ";
+    cin >> N;
+    if (N >= 20) {
+        cout << "Broj unosa mora biti manji od 20!" << endl;
+        return;
+    }
+    brojevi.clear();
+    for (int i = 0; i < N; i++) {
+        int broj;
+        cout << "Unesite broj #" << i + 1 << ": ";
+        cin >> broj;
+        brojevi.push_back(broj);
+    }
+}
+
+void ispisObrnutiRedoslijed(const vector<int>& brojevi) {
+    cout << "Brojevi u obrnutom redoslijedu:" << endl;
+    for (int i = brojevi.size() - 1; i >= 0; i--) {
+        cout << brojevi[i] << " ";
+    }
+    cout << endl;
+}
+
+void ispisRazlika(const vector<int>& brojevi) {
+    cout << "Razlike između unesenih brojeva:" << endl;
+    for (size_t i = 0; i < brojevi.size() - 1; i++) {
+        cout << brojevi[i + 1] - brojevi[i] << " ";
+    }
+    cout << endl;
+}
+
+void pronalazakMinMax(const vector<int>& brojevi) {
+    if (brojevi.empty()) {
+        cout << "Lista je prazna!" << endl;
+        return;
+    }
+    int minB = numeric_limits<int>::max(), maxB = numeric_limits<int>::min();
+    int minIdx = 0, maxIdx = 0;
+
+    for (size_t i = 0; i < brojevi.size(); i++) {
+        if (brojevi[i] < minB) {
+            minB = brojevi[i];
+            minIdx = i;
+        }
+        if (brojevi[i] > maxB) {
+            maxB = brojevi[i];
+            maxIdx = i;
+        }
+    }
+    cout << "Najmanji broj: " << minB << " (Indeks: " << minIdx << ")\n";
+    cout << "Najveći broj: " << maxB << " (Indeks: " << maxIdx << ")\n";
+}
+
+void snimiBrojeveUDatoteku(const vector<int>& brojevi) {
+    string nazivDatoteke;
+    cout << "Unesite naziv datoteke: ";
+    cin >> nazivDatoteke;
+
+    ofstream datoteka(nazivDatoteke);
+    if (!datoteka) {
+        cout << "Greška pri otvaranju datoteke!" << endl;
+        return;
+    }
+
+    datoteka << brojevi.size() << endl;
+    for (const auto& broj : brojevi) {
+        datoteka << broj << endl;
+    }
+
+    cout << "Brojevi su snimljeni!" << endl;
+}
+
+void ucitajBrojeveIzDatoteke(vector<int>& brojevi) {
+    string nazivDatoteke;
+    cout << "Unesite naziv datoteke: ";
+    cin >> nazivDatoteke;
+
+    ifstream datoteka(nazivDatoteke);
+    if (!datoteka) {
+        cout << "Greška pri otvaranju datoteke!" << endl;
+        return;
+    }
+
+    int N;
+    datoteka >> N;
+    brojevi.clear();
+
+    for (int i = 0; i < N; i++) {
+        int broj;
+        datoteka >> broj;
+        brojevi.push_back(broj);
+    }
+
+    cout << "Brojevi su učitani!" << endl;
+}
+
+void ispisSortiranihBrojeva(const vector<int>& original, vector<int> sortirani) {
+    sort(sortirani.begin(), sortirani.end());
+    cout << "Sortirani brojevi:\n";
+    for (const auto& broj : sortirani) {
+        cout << broj << " ";
+    }
+    cout << endl;
+}
+
+int main() {
+    vector<int> brojevi;
+    int N;
+    int izbor;
+
+    do {
+        cout << "\nIzbornik:\n";
+        cout << "1. Unos brojeva\n";
+        cout << "2. Ispis obrnutim redoslijedom\n";
+        cout << "3. Ispis razlika između susjednih brojeva\n";
+        cout << "4. Najmanji i najveći broj\n";
+        cout << "5. Snimanje brojeva u datoteku\n";
+        cout << "6. Učitavanje brojeva iz datoteke\n";
+        cout << "7. Ispis sortiranih brojeva\n";
+        cout << "8. Izlaz\n";
+        cout << "Izaberite opciju: ";
+        cin >> izbor;
+
+        switch (izbor) {
+            case 1: unosBrojeva(brojevi, N); break;
+            case 2: ispisObrnutiRedoslijed(brojevi); break;
+            case 3: ispisRazlika(brojevi); break;
+            case 4: pronalazakMinMax(brojevi); break;
+            case 5: snimiBrojeveUDatoteku(brojevi); break;
+            case 6: ucitajBrojeveIzDatoteke(brojevi); break;
+            case 7: ispisSortiranihBrojeva(brojevi, brojevi); break;
+            case 8: cout << "Izlaz iz programa." << endl; break;
+            default: cout << "Nepoznata opcija!" << endl; break;
+        }
+    } while (izbor != 8);
+
+    return 0;
+}
