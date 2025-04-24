@@ -1,0 +1,177 @@
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <vector>
+#include <algorithm>
+#include <iomanip>
+
+using namespace std;
+
+void generirajNiz(vector<int>& niz, int N);
+void ispisiNiz(const vector<int>& niz, int max_ispis = 50);
+void bubbleSort(vector<int>& niz, bool uzlazno, int& brojKoraka, int& brojZamjena);
+void selectionSort(vector<int>& niz, bool uzlazno, int& brojKoraka, int& brojZamjena);
+void testirajSortiranje();
+
+int main() {
+    srand(time(0));
+
+    int choice;
+    do {
+        cout << "\nGlavni izbornik:\n";
+        cout << "1. Generiraj slucajni niz\n";
+        cout << "2. Testiraj sortiranje na manjem nizu (<50)\n";
+        cout << "3. Testiraj sortiranje na vecim nizovima\n";
+        cout << "4. Izlaz\n";
+        cout << "Odabir: ";
+        cin >> choice;
+
+        switch(choice) {
+            case 1: {
+                int N;
+                cout << "Unesite velicinu niza N: ";
+                cin >> N;
+                vector<int> niz;
+                generirajNiz(niz, N);
+                cout << "Generiran niz od " << N << " elemenata.\n";
+                if (N < 50) ispisiNiz(niz);
+                break;
+            }
+            case 2:
+                testirajSortiranje();
+                break;
+            case 3: {
+                int N;
+                cout << "Unesite velicinu niza N: ";
+                cin >> N;
+                vector<int> niz;
+                generirajNiz(niz, N);
+
+                int sortChoice, koraka, zamjena;
+                cout << "1. Bubble sort\n2. Selection sort\nOdabir: ";
+                cin >> sortChoice;
+
+                cout << "1. Uzlazno\n2. Silazno\nOdabir: ";
+                int dirChoice;
+                cin >> dirChoice;
+                bool uzlazno = (dirChoice == 1);
+
+                vector<int> kopija = niz;
+
+                if (sortChoice == 1) {
+                    bubbleSort(kopija, uzlazno, koraka, zamjena);
+                    cout << "Bubble sort - Koraka: " << koraka << ", Zamjena: " << zamjena << endl;
+                } else {
+                    selectionSort(kopija, uzlazno, koraka, zamjena);
+                    cout << "Selection sort - Koraka: " << koraka << ", Zamjena: " << zamjena << endl;
+                }
+                break;
+            }
+            case 4:
+                cout << "Izlaz iz programa.\n";
+                break;
+            default:
+                cout << "Nevazeci odabir!\n";
+        }
+    } while (choice != 4);
+
+    return 0;
+}
+
+void generirajNiz(vector<int>& niz, int N) {
+    niz.clear();
+    for (int i = 0; i < N; i++) {
+        niz.push_back(rand() % 1000 + 1);
+    }
+}
+
+void ispisiNiz(const vector<int>& niz, int max_ispis) {
+    if (niz.size() > max_ispis) {
+        cout << "Niz je prevelik za ispis (" << niz.size() << " elemenata).\n";
+        return;
+    }
+
+    for (size_t i = 0; i < niz.size(); i++) {
+        cout << setw(4) << niz[i];
+        if ((i+1) % 10 == 0) cout << endl;
+    }
+    cout << endl;
+}
+
+void bubbleSort(vector<int>& niz, bool uzlazno, int& brojKoraka, int& brojZamjena) {
+    brojKoraka = 0;
+    brojZamjena = 0;
+    int n = niz.size();
+
+    for (int i = 0; i < n-1; i++) {
+        for (int j = 0; j < n-i-1; j++) {
+            brojKoraka++;
+            bool uvjet = uzlazno ? (niz[j] > niz[j+1]) : (niz[j] < niz[j+1]);
+            if (uvjet) {
+                swap(niz[j], niz[j+1]);
+                brojZamjena++;
+            }
+        }
+    }
+}
+
+void selectionSort(vector<int>& niz, bool uzlazno, int& brojKoraka, int& brojZamjena) {
+    brojKoraka = 0;
+    brojZamjena = 0;
+    int n = niz.size();
+
+    for (int i = 0; i < n-1; i++) {
+        int extreme = i;
+        for (int j = i+1; j < n; j++) {
+            brojKoraka++;
+            bool uvjet = uzlazno ? (niz[j] < niz[extreme]) : (niz[j] > niz[extreme]);
+            if (uvjet) {
+                extreme = j;
+            }
+        }
+        if (extreme != i) {
+            swap(niz[i], niz[extreme]);
+            brojZamjena++;
+        }
+    }
+}
+
+void testirajSortiranje() {
+    vector<int> niz;
+    generirajNiz(niz, 20);
+
+    cout << "\nOriginalni niz:\n";
+    ispisiNiz(niz);
+
+    int sortChoice;
+    cout << "1. Bubble sort\n2. Selection sort\nOdabir: ";
+    cin >> sortChoice;
+
+    int dirChoice;
+    cout << "1. Uzlazno\n2. Silazno\nOdabir: ";
+    cin >> dirChoice;
+    bool uzlazno = (dirChoice == 1);
+
+    vector<int> bubbleNiz = niz;
+    vector<int> selectionNiz = niz;
+
+    int bubbleKoraka, bubbleZamjena;
+    int selectionKoraka, selectionZamjena;
+
+    bubbleSort(bubbleNiz, uzlazno, bubbleKoraka, bubbleZamjena);
+    selectionSort(selectionNiz, uzlazno, selectionKoraka, selectionZamjena);
+
+    cout << "\nBubble sort rezultat:\n";
+    ispisiNiz(bubbleNiz);
+    cout << "Koraka: " << bubbleKoraka << ", Zamjena: " << bubbleZamjena << endl;
+
+    cout << "\nSelection sort rezultat:\n";
+    ispisiNiz(selectionNiz);
+    cout << "Koraka: " << selectionKoraka << ", Zamjena: " << selectionZamjena << endl;
+
+    if (bubbleNiz == selectionNiz) {
+        cout << "\nOba algoritma daju isti rezultat!\n";
+    } else {
+        cout << "\nGreska: Rezultati se razlikuju!\n";
+    }
+}
