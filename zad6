@@ -1,0 +1,37 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+
+int main(int argc, char* argv[]) {
+    if (argc != 3) {
+        std::cerr << "Upotreba: " << argv[0] << " ulazna_datoteka izlazna_datoteka" << std::endl;
+        return 1;
+    }
+
+    std::ifstream ulaz(argv[1]); 
+    if (!ulaz) {
+        std::cerr << "Greška pri otvaranju ulazne datoteke!" << std::endl;
+        return 1;
+    }
+
+    std::ofstream izlaz(argv[2]);
+    if (!izlaz) {
+        std::cerr << "Greška pri otvaranju izlazne datoteke!" << std::endl;
+        return 1;
+    }
+
+    std::vector<std::string> retci;
+    std::string linija;
+    while (std::getline(ulaz, linija) && retci.size() < 20) {
+        retci.push_back(linija);
+    }
+
+    for (const auto& redak : retci) {
+        izlaz << redak << std::endl;
+        izlaz << redak << std::endl;
+    }
+
+    std::cout << "Proces uspješno završen!" << std::endl;
+
+    return 0;
+}
